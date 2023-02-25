@@ -9,5 +9,6 @@ namespace Testing
         public string Name { get; set; }
         public List<User> Users { get; set; } = new List<User>();
         public List<int> RandomNumbersBecause { get; set; } = new List<int>();
+        public User Owner { get; set; }
     }
 }

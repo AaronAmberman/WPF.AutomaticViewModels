@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
@@ -33,9 +36,7 @@ namespace WPF.AutomaticViewModels
         #region Fields
 
         private List<PropertyInfo> properties;
-        //private Dictionary<string, ObservableCollection<object>> remappedCollectionProperties;
-        //private Dictionary<string, ObservableCollection<PropertyChangeNotifier>> remappedCollectionPropertyNotifiers;
-        private Dictionary<string, AutomaticViewModel> remappedProperties;
+        private Dictionary<string, object> remappedProperties;
         private object wrapped;
 
         #endregion
@@ -69,77 +70,107 @@ namespace WPF.AutomaticViewModels
             // get properties, remove properties that have no setter
             properties = objectToWrap.GetType().GetProperties(propertyFlags).Where(p => p.CanWrite).ToList();
 
-            //remappedCollectionProperties = new Dictionary<string, ObservableCollection<object>>();
-            //remappedCollectionPropertyNotifiers = new Dictionary<string, ObservableCollection<PropertyChangeNotifier>>();
-            remappedProperties = new Dictionary<string, AutomaticViewModel>();
+            remappedProperties = new Dictionary<string, object>();
+
+            RemapComplexTypesAndCollections();
         }
 
         #endregion
 
         #region Methods
 
-        /// <summary>Maps a property to a PropertyChangeNotifier so its properties can broadcast changes.</summary>
-        /// <param name="propertyName">The name of the property to wrap.</param>
-        /// <exception cref="ArgumentNullException">propertyName is null, empty or consist of white-space characters only.</exception>
-        /// <exception cref="KeyNotFoundException">The property name is not found on the object.</exception>
-        public void MapPropertyToNotifier(string propertyName)
+        private void RemapComplexTypesAndCollections()
         {
-            if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentNullException(nameof(propertyName));
+            try
+            {
+                foreach (PropertyInfo propertyInfo in properties)
+                {
+                    // can't remap primitives, only wrap them for notification, which has already been setup in the constructor
+                    if (propertyInfo.PropertyType.IsPrimitive || propertyInfo.PropertyType == typeof(string))
+                        continue;
 
-            PropertyInfo match = properties.FirstOrDefault(p => p.Name == propertyName);
+                    // remap collections (all collection types derive from IEnumerable)
+                    if (propertyInfo.PropertyType.IsSubclassOf(typeof(IEnumerable)) || propertyInfo.PropertyType == typeof(IEnumerable))
+                    {
+                        Type observableCollectionType = typeof(ObservableCollection<>);
 
-            if (match == null) throw new KeyNotFoundException();
+                        IEnumerable values = propertyInfo.GetValue(wrapped) as IEnumerable;
 
-            if (match.PropertyType.IsPrimitive)
-                throw new InvalidOperationException($"propertyName {propertyName} cannot be a primitive type. Must be a complex type with set-able properties.");
+                        if (values == null) continue;
 
-            AutomaticViewModel propertyNotifier = new AutomaticViewModel(match.GetValue(wrapped));
+                        Type argumentType = null;
+                        Type observableType = null;
+                        object collection = null;
 
-            remappedProperties.Add(propertyName, propertyNotifier);
+                        foreach (object value in values)
+                        {
+                            if (argumentType == null)
+                            {
+                                argumentType = value.GetType();
+
+                                if (argumentType.IsPrimitive || argumentType == typeof(string))
+                                {
+                                    // make observable collection type a non-AutomaticViewModel type as it is a non-complex type
+                                    observableType = observableCollectionType.MakeGenericType(argumentType);
+                                }
+                                else if (propertyInfo.PropertyType.IsSubclassOf(typeof(IEnumerable)) || propertyInfo.PropertyType == typeof(IEnumerable))
+                                {
+                                    // a collection of collections
+                                    throw new ArgumentException($"Property {propertyInfo.Name} on type {wrapped.GetType()} is too complex for auto mapping. A collection of collections is not supported. Suggestion is to build your own view models.");
+
+                                    /*
+                                     * The reason a collection of collections isn't supported is because where does it stop? We can't map all that depth at the top
+                                     * level with one collection of remapped properties. Generic collections means the type could have an X number of nested sub types
+                                     * underneath that are also collections.
+                                     */
+                                }
+                                else
+                                {
+                                    argumentType = typeof(AutomaticViewModel);
+
+                                    // make observable collection an AutomaticViewModel type as it is a complex type
+                                    observableType = observableCollectionType.MakeGenericType(argumentType);
+                                }
+
+                                collection = Activator.CreateInstance(observableType);
+                            }
+
+                            IList temp = collection as IList;
+
+                            if (temp != null)
+                            {
+                                if (argumentType == typeof(AutomaticViewModel))
+                                {
+                                    temp.Add(new AutomaticViewModel(value));
+                                }
+                                else
+                                {
+                                    temp.Add(value);
+                                }
+                            }
+                            else
+                            {
+                                Debug.WriteLine("Could not add the value to the collection.");
+
+                                throw new InvalidOperationException($"Cannot auto map property {propertyInfo.Name}. Adding items to auto mapped ObservableCollection failed.");
+                            }
+                        }
+
+                        // processed collection property, move onto next property
+                        continue;
+                    }
+
+                    // if not primitive or not a collection then just wrap in a AutomaticViewModel
+                    AutomaticViewModel automaticViewModel = new AutomaticViewModel(propertyInfo.GetValue(wrapped));
+
+                    remappedProperties.Add(propertyInfo.Name, automaticViewModel);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new TypeInitializationException("WPF.AutomaticViewModels.AutomaticViewModel", ex);
+            }
         }
-
-        //public void MapCollectionPropertyToObservableCollection(string propertyName, bool mapToNotifier)
-        //{
-        //    if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentNullException(nameof(propertyName));
-
-        //    PropertyInfo match = properties.FirstOrDefault(p => p.Name == propertyName);
-
-        //    if (match == null) throw new KeyNotFoundException();
-
-        //    if (!match.PropertyType.IsSubclassOf(typeof(IEnumerable)) || match.PropertyType != typeof(IEnumerable))
-        //        throw new InvalidOperationException($"propertyName {propertyName} is not a collection type.");
-
-        //    IEnumerable values = match.GetValue(wrapped) as IEnumerable;
-
-        //    if (values == null)
-        //        throw new InvalidOperationException($"propertyName {propertyName} could not be cast as an IEnumerable.");
-
-        //    if (mapToNotifier)
-        //    {
-        //        List<PropertyChangeNotifier> remappedValues = new List<PropertyChangeNotifier>();
-
-        //        foreach (object value in values)
-        //        {
-        //            if (value.GetType().IsPrimitive)
-        //                throw new InvalidOperationException($"propertyName {propertyName} cannot be a collection primitive types. Must be a complex type with set-able properties contained in the collection.");
-
-        //            remappedValues.Add(new PropertyChangeNotifier(value));
-        //        }
-
-        //        remappedCollectionPropertyNotifiers.Add(propertyName, new ObservableCollection<PropertyChangeNotifier>(remappedValues));
-        //    }
-        //    else
-        //    {
-        //        List<object> newValues = new List<object>();
-
-        //        foreach (object value in values)
-        //        {
-        //            newValues.Add(value);
-        //        }
-
-        //        remappedCollectionProperties.Add(propertyName, new ObservableCollection<object>(newValues));
-        //    }
-        //}
 
         /// <summary>Attempts to get a property.</summary>
         /// <param name="binder">The binder with the info for property retrieval.</param>
@@ -150,7 +181,12 @@ namespace WPF.AutomaticViewModels
             // if we have a remapped property then we will get that
             if (remappedProperties.ContainsKey(binder.Name))
             {
-                return remappedProperties[binder.Name].TryGetMember(binder, out result);
+                object remapped = remappedProperties[binder.Name];
+
+                if (remapped is AutomaticViewModel propertyViewModel)
+                {
+                    return propertyViewModel.TryGetMember(binder, out result);
+                }
             }
 
             PropertyInfo property = properties.FirstOrDefault(p => p.Name == binder.Name);
@@ -180,7 +216,12 @@ namespace WPF.AutomaticViewModels
             // if we have a remapped property then we set that
             if (remappedProperties.ContainsKey(binder.Name))
             {
-                return remappedProperties[binder.Name].TrySetMember(binder, value);
+                object remapped = remappedProperties[binder.Name];
+
+                if (remapped is AutomaticViewModel propertyViewModel)
+                {
+                    return propertyViewModel.TrySetMember(binder, value);
+                }
             }
 
             PropertyInfo property = properties.FirstOrDefault(p => p.Name == binder.Name);

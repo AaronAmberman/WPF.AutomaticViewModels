@@ -152,7 +152,7 @@ namespace Testing
         private void ButtonThree_Click(object sender, RoutedEventArgs e)
         {
             // change name of sam programmatically 
-            MyWrappedPerson.User.Name = "Same Updated";
+            MyWrappedPerson.User.Name = "Sam Updated";
         }
 
         private void ButtonFour_Click(object sender, RoutedEventArgs e)

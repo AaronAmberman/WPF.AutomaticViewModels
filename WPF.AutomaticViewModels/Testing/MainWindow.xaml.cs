@@ -131,22 +131,42 @@ namespace Testing
 
         private void ButtonOne_Click(object sender, RoutedEventArgs e)
         {
-
+            // change name of tom programmatically 
+            MyPerson.User.Name = "Tom Updated";
         }
 
         private void ButtonTwo_Click(object sender, RoutedEventArgs e)
         {
-
+            // add a user and a random number to tom's address book
+            MyPerson.AddressBook.Users.Add(new User
+            {
+                Address = "12221",
+                Age = 33,
+                Created = DateTime.Now,
+                EmailAddress = "new@new.com",
+                Id = 4,
+                Name = "Tom's New"
+            });
         }
 
         private void ButtonThree_Click(object sender, RoutedEventArgs e)
         {
-
+            // change name of sam programmatically 
+            MyWrappedPerson.User.Name = "Same Updated";
         }
 
         private void ButtonFour_Click(object sender, RoutedEventArgs e)
         {
-
+            // add a user and a random number to sam's address book
+            MyWrappedPerson.AddressBook.Users.Add(new User
+            {
+                Address = "32332",
+                Age = 37,
+                Created = DateTime.Now,
+                EmailAddress = "newWrapped@newWrapped.com",
+                Id = 4,
+                Name = "Sam's New"
+            });
         }
     }
 }

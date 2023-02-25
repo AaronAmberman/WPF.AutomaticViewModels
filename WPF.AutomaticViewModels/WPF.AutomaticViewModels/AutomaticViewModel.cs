@@ -18,7 +18,7 @@ namespace WPF.AutomaticViewModels
     /// <para>
     /// This type reads the public properties of the wrapped object that have setters (need 
     /// to be able to set the value). Which will then be available as properties on this 
-    /// dynamic object. These properties will have built in change notification that push the 
+    /// dynamic object. These properties will have built in change notifications that push the 
     /// value back to the wrapped object.
     /// </para>
     /// <para>

@@ -86,17 +86,23 @@ namespace WPF.AutomaticViewModels
                 foreach (PropertyInfo propertyInfo in properties)
                 {
                     // can't remap primitives, only wrap them for notification, which has already been setup in the constructor
-                    if (propertyInfo.PropertyType.IsPrimitive || propertyInfo.PropertyType == typeof(string))
+                    if (propertyInfo.PropertyType.IsPrimitive || propertyInfo.PropertyType == typeof(string) || propertyInfo.PropertyType == typeof(DateTime))
                         continue;
 
                     // remap collections (all collection types derive from IEnumerable)
-                    if (propertyInfo.PropertyType.IsSubclassOf(typeof(IEnumerable)) || propertyInfo.PropertyType == typeof(IEnumerable))
+                    //bool isIEnumerable = propertyInfo.PropertyType.IsSubclassOf(typeof(IEnumerable)); // this fails
+                    IEnumerable values = propertyInfo.GetValue(wrapped) as IEnumerable; // but this works...why?
+
+                    if (values == null)
+                    {
+                        // if not primitive or not a collection then just wrap in a AutomaticViewModel
+                        AutomaticViewModel automaticViewModel = new AutomaticViewModel(propertyInfo.GetValue(wrapped));
+
+                        remappedProperties.Add(propertyInfo.Name, automaticViewModel);
+                    }
+                    else
                     {
                         Type observableCollectionType = typeof(ObservableCollection<>);
-
-                        IEnumerable values = propertyInfo.GetValue(wrapped) as IEnumerable;
-
-                        if (values == null) continue;
 
                         Type argumentType = null;
                         Type observableType = null;
@@ -159,16 +165,11 @@ namespace WPF.AutomaticViewModels
                         // processed collection property, move onto next property
                         continue;
                     }
-
-                    // if not primitive or not a collection then just wrap in a AutomaticViewModel
-                    AutomaticViewModel automaticViewModel = new AutomaticViewModel(propertyInfo.GetValue(wrapped));
-
-                    remappedProperties.Add(propertyInfo.Name, automaticViewModel);
                 }
             }
             catch (Exception ex)
             {
-                throw new TypeInitializationException("WPF.AutomaticViewModels.AutomaticViewModel", ex);
+                throw new InvalidOperationException($"An error occurred attempting to process object {wrapped}", ex);
             }
         }
 
@@ -181,12 +182,9 @@ namespace WPF.AutomaticViewModels
             // if we have a remapped property then we will get that
             if (remappedProperties.ContainsKey(binder.Name))
             {
-                object remapped = remappedProperties[binder.Name];
+                result = remappedProperties[binder.Name];
 
-                if (remapped is AutomaticViewModel propertyViewModel)
-                {
-                    return propertyViewModel.TryGetMember(binder, out result);
-                }
+                return true;
             }
 
             PropertyInfo property = properties.FirstOrDefault(p => p.Name == binder.Name);
@@ -216,12 +214,11 @@ namespace WPF.AutomaticViewModels
             // if we have a remapped property then we set that
             if (remappedProperties.ContainsKey(binder.Name))
             {
-                object remapped = remappedProperties[binder.Name];
+                remappedProperties[binder.Name] = value;
 
-                if (remapped is AutomaticViewModel propertyViewModel)
-                {
-                    return propertyViewModel.TrySetMember(binder, value);
-                }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(binder.Name));
+
+                return true;
             }
 
             PropertyInfo property = properties.FirstOrDefault(p => p.Name == binder.Name);

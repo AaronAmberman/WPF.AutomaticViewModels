@@ -114,7 +114,7 @@ namespace WPF.AutomaticViewModels
                             {
                                 argumentType = value.GetType();
 
-                                if (argumentType.IsPrimitive || argumentType == typeof(string))
+                                if (argumentType.IsPrimitive || argumentType == typeof(string) || argumentType == typeof(DateTime))
                                 {
                                     // make observable collection type a non-AutomaticViewModel type as it is a non-complex type
                                     observableType = observableCollectionType.MakeGenericType(argumentType);

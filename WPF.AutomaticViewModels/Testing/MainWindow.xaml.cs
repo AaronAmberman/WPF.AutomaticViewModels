@@ -132,13 +132,13 @@ namespace Testing
         private void ButtonOne_Click(object sender, RoutedEventArgs e)
         {
             // change name of tom programmatically 
-            MyPerson.User.Name = "Tom Updated";
+            MyPerson.User.Name = "Tom Updated"; // will update runtime object but will not update the UI
         }
 
         private void ButtonTwo_Click(object sender, RoutedEventArgs e)
         {
             // add a user and a random number to tom's address book
-            MyPerson.AddressBook.Users.Add(new User
+            MyPerson.AddressBook.Users.Add(new User // will update runtime object but will not update the UI
             {
                 Address = "12221",
                 Age = 33,
@@ -152,13 +152,13 @@ namespace Testing
         private void ButtonThree_Click(object sender, RoutedEventArgs e)
         {
             // change name of sam programmatically 
-            MyWrappedPerson.User.Name = "Sam Updated";
+            MyWrappedPerson.User.Name = "Sam Updated"; // will update runtime object and will update the UI
         }
 
         private void ButtonFour_Click(object sender, RoutedEventArgs e)
         {
             // add a user and a random number to sam's address book
-            MyWrappedPerson.AddressBook.Users.Add(new AutomaticViewModel(new User
+            MyWrappedPerson.AddressBook.Users.Add(new AutomaticViewModel(new User // will update runtime object and will update the UI
             {
                 Address = "32332",
                 Age = 37,
@@ -167,6 +167,11 @@ namespace Testing
                 Id = 4,
                 Name = "Sam's New"
             }));
+
+            // notice how we add an AutomaticViewModel to the collection, that is because that is the type it takes, remapped collections
+            // will take AutomaticViewModels unless the collection contains a primitive type, string or DateTime; then the collection
+            // From MSDN:
+            // Primitive types: Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, IntPtr, UIntPtr, Char, Double, and Single.
         }
     }
 }

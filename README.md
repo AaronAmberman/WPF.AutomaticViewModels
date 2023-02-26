@@ -4,7 +4,7 @@ An API that provides functionality to automatically add property change notifica
 ## What is an AutomaticViewModel
 It is exactly what you think it is by name. A wrapper object that can wrap most any object and add property change notifications to it. Property change notifications originate from the AutomatciViewModel and changes are pushed back to the wrapped object so no additional code needs to be written to keep the view model and the model in sync. 
 
-## How Does it Work
+## How Does it Work?
 For starters the AutomaticViewModel is a *dynamic* object so that it can be interpreted at runtime. We are not going to go over how *dynamic* objects work in .NET so if you don't know then please google it and read up on it. Should only take a few minutes. 
 
 ### Public Property Mapping

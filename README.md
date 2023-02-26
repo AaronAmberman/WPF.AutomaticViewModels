@@ -32,7 +32,7 @@ As aforementioned, collections of collections. The API will throw an error at ru
 
 ## What the API Is and What It Is Not
 ### What It Is Not
-It is not meant to replace the need for a complex view model written by hand. In situations where you have the need for a complex view model (such as one with additional validation rules or something) then this simple API is not for you.
+It is not meant to replace the need for a complex view models written by hand. In situations where you have the need for a complex view model (such as one with additional validation rules or something) then this simple API is not for you.
 
 ### What It Is
 It is a simple type auto mapper that adds property change notifications with the ability to remap complex and collection type properties. To be used in situations where the UI workflow is simple, where the data management flow in simple. 

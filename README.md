@@ -22,6 +22,8 @@ If the AutomaticViewModel encounters a complex type (does not fit into the above
 ### Collection Property Types
 If the AutomaticViewModel encounters a collection of any kind type it will generate an ObservableCollection of the same type (or object in the case of non-generic collections such as IList). 
 
+The AutomaticViewModel will wrap complex types in the collections. So the wrapped object will have an `ObservableCollection<AutomaticViewModel>` collection not a `List<User>` collection, for example. The AutomaticViewModels in the ObservableCollection will wrap the object from the collection in the passed in object's collection (so in the case of our example the User object would be wrapped) so it will mimic it at runtime.
+
 ### Collections of Collections
 This is where the AutomaticViewModel needs to draw the line. As we enter the realm of generics we have to limit how deep we dig. This greatly increases the complexity or property/type management. What if a Collection has a collection of tuples that had a collection in it? I mean shame on your for writing such a complex property type but complex types are common with generics. So if you have a lot of various generics or collections of collections in your data models than consider making your own view models. 
 

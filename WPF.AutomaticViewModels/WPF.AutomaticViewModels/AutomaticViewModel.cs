@@ -119,7 +119,8 @@ namespace WPF.AutomaticViewModels
                                     // make observable collection type a non-AutomaticViewModel type as it is a non-complex type
                                     observableType = observableCollectionType.MakeGenericType(argumentType);
                                 }
-                                else if (propertyInfo.PropertyType.IsSubclassOf(typeof(IEnumerable)) || propertyInfo.PropertyType == typeof(IEnumerable))
+                                //else if (propertyInfo.PropertyType.IsSubclassOf(typeof(IEnumerable)) || propertyInfo.PropertyType == typeof(IEnumerable)) // this fails
+                                else if (value is IEnumerable enumerable) // but this works...why?
                                 {
                                     // a collection of collections
                                     throw new ArgumentException($"Property {propertyInfo.Name} on type {wrapped.GetType()} is too complex for auto mapping. A collection of collections is not supported. Suggestion is to build your own view model.");

@@ -126,7 +126,7 @@ namespace WPF.AutomaticViewModels
 
                                     /*
                                      * The reason a collection of collections isn't supported is because where does it stop? We can't map all that depth at the top
-                                     * level with one collection of remapped properties. Generic collections means the type could have an X number of nested sub types
+                                     * level with one collection of remapped properties. Generic collections mean the type could have an X number of nested sub types
                                      * underneath that are also collections.
                                      */
                                 }

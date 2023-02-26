@@ -162,6 +162,8 @@ namespace WPF.AutomaticViewModels
                             }
                         }
 
+                        remappedProperties.Add(propertyInfo.Name, collection);
+
                         // processed collection property, move onto next property
                         continue;
                     }

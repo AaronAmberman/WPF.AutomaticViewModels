@@ -158,7 +158,7 @@ namespace Testing
         private void ButtonFour_Click(object sender, RoutedEventArgs e)
         {
             // add a user and a random number to sam's address book
-            MyWrappedPerson.AddressBook.Users.Add(new User
+            MyWrappedPerson.AddressBook.Users.Add(new AutomaticViewModel(new User
             {
                 Address = "32332",
                 Age = 37,
@@ -166,7 +166,7 @@ namespace Testing
                 EmailAddress = "newWrapped@newWrapped.com",
                 Id = 4,
                 Name = "Sam's New"
-            });
+            }));
         }
     }
 }

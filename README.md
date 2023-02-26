@@ -1,7 +1,7 @@
 # WPF.AutomaticViewModels
 An API that provides functionality to automatically add property change notifications to objects by providing special object wrappers.
 
-## What is an AutomaticViewModel
+## What is an AutomaticViewModel?
 It is exactly what you think it is by name. A wrapper object that can wrap most any object and add property change notifications to it. Property change notifications originate from the AutomatciViewModel and changes are pushed back to the wrapped object so no additional code needs to be written to keep the view model and the model in sync. 
 
 ## How Does it Work?

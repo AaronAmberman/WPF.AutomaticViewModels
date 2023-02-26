@@ -11,7 +11,7 @@ For starters the AutomaticViewModel is a *dynamic* object so that it can be inte
 The AutomaticViewModel has 2 constructors, `AutomaticViewModel(object)` and `AutomaticViewModel(object, BindingFlags)`. Both only grab properties of the specified type. The `AutomaticViewModel(object)` constructor will grab all public instance properties. The `AutomaticViewModel(object, BindingFlags)` constructor will grab whatever the specified binding flags tell it to grab. Property names are an exact match.
 
 ### No Expansion
-These *dynamic* objects ***do not*** allow for additional properties, methods or events to be added to it, they are immutable. The properties themselves though are mutable, they need to be in order to automatically update the UI.
+These *dynamic* objects ***do not*** allow for additional properties, methods or events to be added to it, they are immutable. The properties themselves are mutable, they need to be in order to automatically update the UI.
 
 ## Auto Remapping
 The AutomaticViewModel will gladly wrap any primitive type (Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, IntPtr, UIntPtr, Char, Double, and Single), String or DateTime without the need for any remapping to occur. They will still have property change notifications. Auto remappings occur during construction of the object.

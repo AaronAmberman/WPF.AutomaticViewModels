@@ -122,7 +122,7 @@ namespace WPF.AutomaticViewModels
                                 else if (propertyInfo.PropertyType.IsSubclassOf(typeof(IEnumerable)) || propertyInfo.PropertyType == typeof(IEnumerable))
                                 {
                                     // a collection of collections
-                                    throw new ArgumentException($"Property {propertyInfo.Name} on type {wrapped.GetType()} is too complex for auto mapping. A collection of collections is not supported. Suggestion is to build your own view models.");
+                                    throw new ArgumentException($"Property {propertyInfo.Name} on type {wrapped.GetType()} is too complex for auto mapping. A collection of collections is not supported. Suggestion is to build your own view model.");
 
                                     /*
                                      * The reason a collection of collections isn't supported is because where does it stop? We can't map all that depth at the top

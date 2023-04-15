@@ -5,6 +5,22 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>disable</Nullable>
     <UseWPF>true</UseWPF>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>1.0.0</Version>
+    <Authors>Aaron Amberman</Authors>
+    <Description>An API that provides functionality to automatically add property change notifications to objects by providing special object wrappers.</Description>
+    <Copyright>© Aaron Amberman 2023</Copyright>
+    <PackageProjectUrl>https://github.com/AaronAmberman/WPF.AutomaticViewModels</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>ViewModel;View Model;Automatic ViewModel;Automatic View Model;AutomaticViewModel</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

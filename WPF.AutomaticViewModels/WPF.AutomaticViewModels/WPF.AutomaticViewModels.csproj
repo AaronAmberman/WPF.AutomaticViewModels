@@ -6,7 +6,7 @@
     <Nullable>disable</Nullable>
     <UseWPF>true</UseWPF>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Aaron Amberman</Authors>
     <Description>An API that provides functionality to automatically add property change notifications to objects by providing special object wrappers.</Description>
     <Copyright>© Aaron Amberman 2023</Copyright>
@@ -15,6 +15,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>ViewModel;View Model;Automatic ViewModel;Automatic View Model;AutomaticViewModel;WPF AutomaticViewModel; WPF Automatic ViewModel; WPF Automatic View Model</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/AaronAmberman/WPF.AutomaticViewModels</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
